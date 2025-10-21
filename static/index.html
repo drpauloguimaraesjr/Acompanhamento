@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema Médico</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "Inter", "Segoe UI", Arial, sans-serif;
+        --accent: #1273de;
+        --accent-dark: #0b4c94;
+        --border: rgba(15, 61, 104, 0.15);
+        --bg: #f6f9fc;
+        --bg-card: #ffffff;
+        --danger: #c62828;
+        --success: #2e7d32;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: #1f2933;
+        min-height: 100vh;
+      }
+
+      header {
+        background: linear-gradient(120deg, #0f3d68, #1273de);
+        color: white;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(18, 115, 222, 0.25);
+      }
+
+      header h1 {
+        margin: 0 0 0.75rem;
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 700;
+      }
+
+      header p {
+        margin: 0;
+        font-size: 1.05rem;
+        opacity: 0.9;
+      }
+
+      header nav {
+        margin-top: 1.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+      }
+
+      header nav a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 0.6rem 1.1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.15);
+        transition: background 0.2s ease-in-out, transform 0.2s;
+      }
+
+      header nav a:hover,
+      header nav a:focus {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateY(-2px);
+      }
+
+      main {
+        width: min(1120px, 92vw);
+        margin: -3.5rem auto 3rem;
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      section {
+        background: var(--bg-card);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 18px 45px rgba(15, 61, 104, 0.12);
+        border: 1px solid var(--border);
+      }
+
+      section h2 {
+        margin-top: 0;
+        font-size: 1.6rem;
+        color: #0f3d68;
+      }
+
+      .forms {
+        display: grid;
+        gap: 1rem;
+      }
+
+      form {
+        display: grid;
+        gap: 0.85rem;
+      }
+
+      fieldset {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin: 0;
+        display: grid;
+        gap: 1rem;
+        background: rgba(18, 115, 222, 0.04);
+      }
+
+      fieldset legend {
+        font-weight: 600;
+        color: #0f3d68;
+        padding: 0 0.5rem;
+      }
+
+      label {
+        font-weight: 600;
+        display: grid;
+        gap: 0.35rem;
+        font-size: 0.95rem;
+      }
+
+      input,
+      textarea,
+      select,
+      button {
+        font: inherit;
+      }
+
+      input,
+      textarea,
+      select {
+        padding: 0.65rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: white;
+        transition: border 0.2s ease-in-out, box-shadow 0.2s;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(18, 115, 222, 0.15);
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      button {
+        border: none;
+        border-radius: 999px;
+        padding: 0.75rem 1.3rem;
+        font-weight: 600;
+        cursor: pointer;
+        justify-self: start;
+        background: var(--accent);
+        color: white;
+        transition: background 0.2s ease-in-out, transform 0.2s;
+      }
+
+      button:hover,
+      button:focus {
+        background: var(--accent-dark);
+        transform: translateY(-1px);
+      }
+
+      button.danger {
+        background: var(--danger);
+      }
+
+      button.danger:hover,
+      button.danger:focus {
+        background: #8e1c1c;
+      }
+
+      button.secondary {
+        background: rgba(15, 61, 104, 0.1);
+        color: #0f3d68;
+      }
+
+      button.secondary:hover,
+      button.secondary:focus {
+        background: rgba(15, 61, 104, 0.2);
+      }
+
+      .grid-columns {
+        display: grid;
+        gap: 1rem;
+      }
+
+      @media (min-width: 720px) {
+        .grid-columns {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      .feedback {
+        margin: 1rem auto 0;
+        padding: 0.85rem 1.1rem;
+        border-radius: 12px;
+        border: 1px solid transparent;
+        background: rgba(18, 115, 222, 0.08);
+        color: #0f3d68;
+        font-weight: 600;
+        display: none;
+      }
+
+      .feedback.show {
+        display: block;
+      }
+
+      .feedback.error {
+        background: rgba(198, 40, 40, 0.08);
+        color: var(--danger);
+        border-color: rgba(198, 40, 40, 0.2);
+      }
+
+      .feedback.success {
+        background: rgba(46, 125, 50, 0.08);
+        color: var(--success);
+        border-color: rgba(46, 125, 50, 0.2);
+      }
+
+      .cards {
+        display: grid;
+        gap: 1rem;
+        margin-top: 1.25rem;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.25rem;
+        background: white;
+        display: grid;
+        gap: 0.75rem;
+        position: relative;
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #0f3d68;
+      }
+
+      .card dl {
+        margin: 0;
+        display: grid;
+        gap: 0.35rem;
+        grid-template-columns: max-content 1fr;
+        font-size: 0.95rem;
+      }
+
+      .card dt {
+        font-weight: 600;
+        color: #52606d;
+      }
+
+      .card dd {
+        margin: 0;
+      }
+
+      .card footer {
+        display: flex;
+        gap: 0.75rem;
+      }
+
+      .placeholder,
+      .error-message {
+        padding: 1rem;
+        border-radius: 12px;
+        text-align: center;
+        background: rgba(15, 61, 104, 0.05);
+      }
+
+      .error-message {
+        background: rgba(198, 40, 40, 0.08);
+        color: var(--danger);
+        font-weight: 600;
+      }
+
+      .empty-state {
+        display: grid;
+        gap: 0.5rem;
+        justify-items: center;
+        padding: 2rem 1rem;
+        border: 2px dashed rgba(15, 61, 104, 0.1);
+        border-radius: 16px;
+        color: #52606d;
+      }
+
+      .empty-state strong {
+        color: #0f3d68;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Sistema Médico</h1>
+      <p>Gerencie pacientes e consultas diretamente da interface web.</p>
+      <nav>
+        <a href="/docs" target="_blank" rel="noreferrer">Documentação interativa</a>
+        <a href="/redoc" target="_blank" rel="noreferrer">Referência ReDoc</a>
+      </nav>
+    </header>
+
+    <main>
+      <section aria-labelledby="gestao-pacientes">
+        <h2 id="gestao-pacientes">Pacientes</h2>
+        <p>Cadastre novos pacientes e visualize os dados cadastrados.</p>
+        <div class="forms">
+          <form id="patient-form">
+            <fieldset>
+              <legend>Novo paciente</legend>
+              <div class="grid-columns">
+                <label>
+                  Nome completo
+                  <input
+                    type="text"
+                    name="nome"
+                    required
+                    minlength="3"
+                    maxlength="100"
+                    placeholder="Maria da Silva"
+                  />
+                </label>
+                <label>
+                  Telefone de contato
+                  <input
+                    type="tel"
+                    name="telefone"
+                    required
+                    minlength="8"
+                    maxlength="20"
+                    placeholder="(11) 99999-0000"
+                  />
+                </label>
+              </div>
+              <label>
+                Data de nascimento
+                <input type="date" name="data_nascimento" required />
+              </label>
+              <button type="submit">Salvar paciente</button>
+            </fieldset>
+          </form>
+        </div>
+        <div class="cards" id="patients-list" aria-live="polite"></div>
+      </section>
+
+      <section aria-labelledby="gestao-consultas">
+        <h2 id="gestao-consultas">Consultas</h2>
+        <p>Relacione consultas aos pacientes cadastrados para acompanhar o histórico.</p>
+        <form id="appointment-form">
+          <fieldset>
+            <legend>Nova consulta</legend>
+            <div class="grid-columns">
+              <label>
+                Paciente
+                <select id="consulta-paciente" name="paciente_id" required>
+                  <option value="" selected disabled>
+                    Cadastre um paciente para habilitar
+                  </option>
+                </select>
+              </label>
+              <label>
+                Data e horário
+                <input type="datetime-local" name="data" required />
+              </label>
+            </div>
+            <label>
+              Descrição
+              <textarea
+                name="descricao"
+                placeholder="Ex.: Retorno com resultados de exames"
+                required
+                minlength="3"
+                maxlength="255"
+              ></textarea>
+            </label>
+            <button type="submit">Agendar consulta</button>
+          </fieldset>
+        </form>
+        <div class="cards" id="appointments-list" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <div id="feedback" class="feedback" role="status" aria-live="assertive"></div>
+
+    <script>
+      (function () {
+        const apiBase = "/api";
+        const patientForm = document.getElementById("patient-form");
+        const appointmentForm = document.getElementById("appointment-form");
+        const patientList = document.getElementById("patients-list");
+        const appointmentList = document.getElementById("appointments-list");
+        const patientSelect = document.getElementById("consulta-paciente");
+        const feedback = document.getElementById("feedback");
+        const appointmentSubmit = appointmentForm.querySelector('button[type="submit"]');
+        const patientMap = new Map();
+
+        function showFeedback(message, type = "info") {
+          feedback.textContent = message;
+          feedback.className = `feedback show ${type === "error" ? "error" : type === "success" ? "success" : ""}`;
+          window.clearTimeout(showFeedback.timeoutId);
+          showFeedback.timeoutId = window.setTimeout(() => {
+            feedback.className = "feedback";
+            feedback.textContent = "";
+          }, 4000);
+        }
+
+        async function fetchJSON(url, options = {}) {
+          const config = { ...options };
+          if (config.body && !(config.headers && config.headers["Content-Type"])) {
+            config.headers = { ...config.headers, "Content-Type": "application/json" };
+          }
+
+          const response = await fetch(url, config);
+
+          if (!response.ok) {
+            let detail = "Erro ao comunicar com o servidor.";
+            try {
+              const data = await response.json();
+              if (data && data.detail) {
+                detail = Array.isArray(data.detail)
+                  ? data.detail.map((item) => item.msg || item).join("; ")
+                  : data.detail;
+              }
+            } catch (error) {
+              // Sem conteúdo JSON, mantém mensagem padrão
+            }
+            throw new Error(detail);
+          }
+
+          if (response.status === 204) {
+            return null;
+          }
+
+          return response.json();
+        }
+
+        function formatDate(value) {
+          return new Date(value).toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          });
+        }
+
+        function formatDateTime(value) {
+          return new Date(value).toLocaleString("pt-BR", {
+            dateStyle: "short",
+            timeStyle: "short",
+          });
+        }
+
+        function updatePatientSelect() {
+          patientSelect.innerHTML = "";
+          if (patientMap.size === 0) {
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "Cadastre um paciente para habilitar";
+            option.disabled = true;
+            option.selected = true;
+            patientSelect.appendChild(option);
+            patientSelect.disabled = true;
+            appointmentSubmit.disabled = true;
+            return;
+          }
+
+          patientSelect.disabled = false;
+          appointmentSubmit.disabled = false;
+
+          const defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.textContent = "Selecione um paciente";
+          defaultOption.disabled = true;
+          defaultOption.selected = true;
+          patientSelect.appendChild(defaultOption);
+
+          patientMap.forEach((patient) => {
+            const option = document.createElement("option");
+            option.value = patient.id;
+            option.textContent = patient.nome;
+            patientSelect.appendChild(option);
+          });
+        }
+
+        function renderPatients() {
+          patientList.innerHTML = "";
+          if (patientMap.size === 0) {
+            patientList.innerHTML = `
+              <div class="empty-state">
+                <strong>Nenhum paciente cadastrado.</strong>
+                <span>Preencha o formulário acima para adicionar o primeiro registro.</span>
+              </div>
+            `;
+            return;
+          }
+
+          const fragment = document.createDocumentFragment();
+          patientMap.forEach((patient) => {
+            fragment.appendChild(createPatientCard(patient));
+          });
+          patientList.appendChild(fragment);
+        }
+
+        function renderAppointments(appointments) {
+          appointmentList.innerHTML = "";
+
+          if (!appointments || appointments.length === 0) {
+            appointmentList.innerHTML = `
+              <div class="empty-state">
+                <strong>Nenhuma consulta cadastrada.</strong>
+                <span>Utilize o formulário acima para agendar uma nova consulta.</span>
+              </div>
+            `;
+            return;
+          }
+
+          const fragment = document.createDocumentFragment();
+          appointments.forEach((appointment) => {
+            fragment.appendChild(createAppointmentCard(appointment));
+          });
+          appointmentList.appendChild(fragment);
+        }
+
+        function createPatientCard(patient) {
+          const article = document.createElement("article");
+          article.className = "card";
+          article.dataset.patientId = patient.id;
+          article.innerHTML = `
+            <div>
+              <h3>${patient.nome}</h3>
+              <dl>
+                <dt>Telefone</dt>
+                <dd>${patient.telefone}</dd>
+                <dt>Nascimento</dt>
+                <dd>${formatDate(patient.data_nascimento)}</dd>
+                <dt>ID</dt>
+                <dd><code>${patient.id}</code></dd>
+              </dl>
+            </div>
+          `;
+
+          const footer = document.createElement("footer");
+          const removeButton = document.createElement("button");
+          removeButton.type = "button";
+          removeButton.className = "danger";
+          removeButton.textContent = "Excluir";
+          removeButton.addEventListener("click", () => deletePatient(patient.id));
+
+          footer.appendChild(removeButton);
+          article.appendChild(footer);
+          return article;
+        }
+
+        function createAppointmentCard(appointment) {
+          const article = document.createElement("article");
+          article.className = "card";
+          article.dataset.appointmentId = appointment.id;
+          const patient = patientMap.get(appointment.paciente_id);
+          const patientName = patient ? patient.nome : "Paciente removido";
+          article.innerHTML = `
+            <div>
+              <h3>${patientName}</h3>
+              <dl>
+                <dt>Data</dt>
+                <dd>${formatDateTime(appointment.data)}</dd>
+                <dt>Descrição</dt>
+                <dd>${appointment.descricao}</dd>
+                <dt>ID</dt>
+                <dd><code>${appointment.id}</code></dd>
+              </dl>
+            </div>
+          `;
+
+          const footer = document.createElement("footer");
+          const removeButton = document.createElement("button");
+          removeButton.type = "button";
+          removeButton.className = "danger";
+          removeButton.textContent = "Cancelar";
+          removeButton.addEventListener("click", () => deleteAppointment(appointment.id));
+
+          footer.appendChild(removeButton);
+          article.appendChild(footer);
+          return article;
+        }
+
+        async function deletePatient(patientId) {
+          const confirmation = window.confirm("Deseja remover este paciente? Consultas relacionadas serão excluídas.");
+          if (!confirmation) {
+            return;
+          }
+
+          try {
+            await fetchJSON(`${apiBase}/pacientes/${patientId}`, { method: "DELETE" });
+            patientMap.delete(patientId);
+            showFeedback("Paciente removido com sucesso.", "success");
+            updatePatientSelect();
+            renderPatients();
+            loadAppointments();
+          } catch (error) {
+            showFeedback(error.message, "error");
+          }
+        }
+
+        async function deleteAppointment(appointmentId) {
+          const confirmation = window.confirm("Confirma cancelar esta consulta?");
+          if (!confirmation) {
+            return;
+          }
+
+          try {
+            await fetchJSON(`${apiBase}/consultas/${appointmentId}`, { method: "DELETE" });
+            showFeedback("Consulta removida.", "success");
+            loadAppointments();
+          } catch (error) {
+            showFeedback(error.message, "error");
+          }
+        }
+
+        patientForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(patientForm);
+          const payload = {
+            nome: formData.get("nome").trim(),
+            telefone: formData.get("telefone").trim(),
+            data_nascimento: formData.get("data_nascimento"),
+          };
+
+          if (!payload.nome || !payload.telefone || !payload.data_nascimento) {
+            showFeedback("Preencha todos os campos obrigatórios.", "error");
+            return;
+          }
+
+          try {
+            const newPatient = await fetchJSON(`${apiBase}/pacientes`, {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            patientForm.reset();
+            showFeedback("Paciente cadastrado com sucesso!", "success");
+            patientMap.set(newPatient.id, newPatient);
+            updatePatientSelect();
+            renderPatients();
+          } catch (error) {
+            showFeedback(error.message, "error");
+          }
+        });
+
+        appointmentForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const formData = new FormData(appointmentForm);
+          const pacienteId = formData.get("paciente_id");
+          const dataConsulta = formData.get("data");
+          const descricao = formData.get("descricao").trim();
+
+          if (!pacienteId || !dataConsulta || !descricao) {
+            showFeedback("Preencha todos os campos da consulta.", "error");
+            return;
+          }
+
+          const payload = {
+            paciente_id: pacienteId,
+            data: new Date(dataConsulta).toISOString(),
+            descricao,
+          };
+
+          try {
+            await fetchJSON(`${apiBase}/consultas`, {
+              method: "POST",
+              body: JSON.stringify(payload),
+            });
+            appointmentForm.reset();
+            updatePatientSelect();
+            showFeedback("Consulta agendada com sucesso!", "success");
+            loadAppointments();
+          } catch (error) {
+            showFeedback(error.message, "error");
+          }
+        });
+
+        async function loadPatients() {
+          patientList.innerHTML = '<p class="placeholder">Carregando pacientes...</p>';
+          try {
+            const patients = await fetchJSON(`${apiBase}/pacientes`);
+            patientMap.clear();
+            patients.forEach((patient) => {
+              patientMap.set(patient.id, patient);
+            });
+            updatePatientSelect();
+            renderPatients();
+          } catch (error) {
+            patientList.innerHTML = `<p class="error-message">${error.message}</p>`;
+          }
+        }
+
+        async function loadAppointments() {
+          appointmentList.innerHTML = '<p class="placeholder">Carregando consultas...</p>';
+          try {
+            const appointments = await fetchJSON(`${apiBase}/consultas`);
+            renderAppointments(appointments);
+          } catch (error) {
+            appointmentList.innerHTML = `<p class="error-message">${error.message}</p>`;
+          }
+        }
+
+        loadPatients().then(loadAppointments);
+      })();
+    </script>
+  </body>
+</html>
