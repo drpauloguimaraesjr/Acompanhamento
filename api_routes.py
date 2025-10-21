@@ -9,7 +9,7 @@ imediatamente de um banco de dados real.
 from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Dict, List
+from typing import Any, Dict, List, TypeVar, cast
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, HTTPException, status
@@ -61,6 +61,16 @@ class Appointment(AppointmentBase):
 _patients: Dict[UUID, Patient] = {}
 _appointments: Dict[UUID, Appointment] = {}
 
+ModelT = TypeVar("ModelT", bound=BaseModel)
+
+
+def _model_dump(model: ModelT) -> Dict[str, Any]:
+    """Return a dictionary representation compatible with Pydantic v1 and v2."""
+
+    if hasattr(model, "model_dump"):
+        return cast(Dict[str, Any], getattr(model, "model_dump")())
+    return cast(Dict[str, Any], model.dict())
+
 
 @router.get("/health", tags=["health"])
 def healthcheck() -> Dict[str, str]:
@@ -84,7 +94,7 @@ def listar_pacientes() -> List[Patient]:
 def criar_paciente(payload: PatientCreate) -> Patient:
     """Cria um novo paciente na base em memória."""
 
-    novo_paciente = Patient(id=uuid4(), **payload.model_dump())
+    novo_paciente = Patient(id=uuid4(), **_model_dump(payload))
     _patients[novo_paciente.id] = novo_paciente
     return novo_paciente
 
@@ -106,7 +116,7 @@ def atualizar_paciente(paciente_id: UUID, payload: PatientCreate) -> Patient:
     if paciente_id not in _patients:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Paciente não encontrado")
 
-    paciente_atualizado = Patient(id=paciente_id, **payload.model_dump())
+    paciente_atualizado = Patient(id=paciente_id, **_model_dump(payload))
     _patients[paciente_id] = paciente_atualizado
     return paciente_atualizado
 
@@ -147,7 +157,7 @@ def criar_consulta(payload: AppointmentCreate) -> Appointment:
     if payload.paciente_id not in _patients:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Paciente não encontrado para a consulta")
 
-    nova_consulta = Appointment(id=uuid4(), **payload.model_dump())
+    nova_consulta = Appointment(id=uuid4(), **_model_dump(payload))
     _appointments[nova_consulta.id] = nova_consulta
     return nova_consulta
 
